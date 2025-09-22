@@ -178,52 +178,52 @@ This is the perfect deployment method for this client-side application - **no se
 - ✅ **Scalable**: Handles traffic spikes automatically
 - ✅ **Fast**: Served from Google's global CDN
 - ✅ **Simple**: No server management required
-- ✅ **Secure**: HTTPS enabled by default
+- ✅ **Secure**: HTTPS is available on the default `storage.googleapis.com` URL. (A load balancer is needed for HTTPS on a custom domain, see below).
 
-#### Quick Deployment
+#### Prerequisites
+-   Google Cloud SDK (`gcloud`) must be installed and authenticated.
+-   You need appropriate permissions in the target Google Cloud project (`greenbutton-qa-472903`).
 
+#### How to Deploy
+The `deploy-gcp.sh` script is used for all deployments. Make sure it's executable first:
 ```bash
-# Make scripts executable (first time only)
-chmod +x deploy-gcp.sh update-gcp.sh serve-local.sh
+chmod +x deploy-gcp.sh
+```
 
-# Initial deployment to Google Cloud Storage
+##### Deploying to QA (Default)
+To deploy to the QA environment, run the script without any arguments:
+```bash
 ./deploy-gcp.sh
+```
 
-# For future updates (after making changes)
-./update-gcp.sh
+##### Deploying to Production
+To deploy to the Production environment (which uses a separate bucket in the same project), pass `prod` as the first argument:
+```bash
+./deploy-gcp.sh prod
 ```
 
 The deployment script will:
-1. Create a storage bucket
-2. Configure it for website hosting
-3. Upload all your files
-4. Set proper caching headers
-5. Make it publicly accessible
-6. Save configuration for easy updates
-7. Give you the live URL
+1. Create a storage bucket if it doesn't exist.
+2. Configure it for website hosting.
+3. Upload all your files.
+4. Set proper caching headers.
+5. Make it publicly accessible.
+6. Give you the live URL.
 
-#### Making Updates
+#### Custom Domain & HTTPS (Load Balancer)
+The deployment script **does not** set up a Google Cloud Load Balancer. A load balancer is required to use HTTPS with a custom domain.
 
-After your initial deployment, making updates is super easy:
+- **Without a Load Balancer**: You can point a custom domain to your bucket using a CNAME record. This method **does not support HTTPS**.
+- **With a Load Balancer (Recommended for Production)**: To use HTTPS with a custom domain, you must set up an external HTTPS Load Balancer. This is the standard way to serve a static site securely from a custom domain on GCP.
 
-```bash
-# Make your changes to HTML, CSS, or JS files
-# Then run the update script:
-./update-gcp.sh
-```
-
-The update script is much faster than the initial deployment since it skips the bucket setup.
-
-#### Custom Domain (Optional)
-After deployment, you can easily add a custom domain:
-1. Follow the script output instructions
-2. Or see: https://cloud.google.com/storage/docs/hosting-static-website#custom-domain
+For detailed instructions, see the official documentation: [Hosting a static website with a load balancer](https://cloud.google.com/storage/docs/hosting-static-website-load-balancer).
 
 #### Estimated Costs
 For a typical small website:
 - Storage: ~$0.50/month for 25GB
 - Bandwidth: ~$1.00/month for 100GB transfer
 - **Total: ~$1.50/month** (much cheaper than App Engine!)
+(Note: A load balancer will add a small additional cost).
 
 ### Alternative Deployment Options
 

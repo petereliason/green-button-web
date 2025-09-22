@@ -6,11 +6,9 @@
 
 set -e  # Exit on any error
 
-# Configuration
-PROJECT_ID=""
-BUCKET_NAME=""
+# Configuration is now set based on environment below
 REGION="us-central1"
-CONFIG_FILE=".gcp-deploy-config"
+# PROJECT_ID, BUCKET_NAME, and CONFIG_FILE are set per-environment
 
 # Colors for output
 RED='\033[0;31m'
@@ -137,33 +135,33 @@ deploy_files() {
     
     # Set cache control headers for different file types
     print_status "Uploading HTML files ($html_files files)..."
-    gsutil -m cp -r *.html gs://"$BUCKET_NAME"/ \
-        -h "Cache-Control:no-cache, max-age=0" \
-        -h "Content-Type:text/html"
+    gsutil -m -h "Cache-Control:no-cache, max-age=0" \
+        -h "Content-Type:text/html" \
+        cp *.html gs://"$BUCKET_NAME"/
     
     print_status "Uploading CSS files ($css_files files)..."
-    gsutil -m cp -r *.css gs://"$BUCKET_NAME"/ \
-        -h "Cache-Control:public, max-age=86400" \
-        -h "Content-Type:text/css"
+    gsutil -m -h "Cache-Control:public, max-age=86400" \
+        -h "Content-Type:text/css" \
+        cp *.css gs://"$BUCKET_NAME"/
     
     print_status "Uploading JavaScript files ($js_files files)..."
-    gsutil -m cp -r *.js gs://"$BUCKET_NAME"/ \
-        -h "Cache-Control:public, max-age=86400" \
-        -h "Content-Type:application/javascript"
+    gsutil -m -h "Cache-Control:public, max-age=86400" \
+        -h "Content-Type:application/javascript" \
+        cp *.js gs://"$BUCKET_NAME"/
     
     if [[ $xml_files -gt 0 ]]; then
         print_status "Uploading sample XML files ($xml_files files)..."
-        gsutil -m cp *.xml gs://"$BUCKET_NAME"/ \
-            -h "Cache-Control:public, max-age=86400" \
-            -h "Content-Type:application/xml"
+        gsutil -m -h "Cache-Control:public, max-age=86400" \
+            -h "Content-Type:application/xml" \
+            cp *.xml gs://"$BUCKET_NAME"/
     fi
     
     # Upload README if it exists
     if [[ -f "README.md" ]]; then
         print_status "Uploading README.md..."
-        gsutil cp README.md gs://"$BUCKET_NAME"/ \
-            -h "Cache-Control:public, max-age=3600" \
-            -h "Content-Type:text/markdown"
+        gsutil -h "Cache-Control:public, max-age=3600" \
+            -h "Content-Type:text/markdown" \
+            cp README.md gs://"$BUCKET_NAME"/
     fi
     
     print_success "Files deployed successfully"
@@ -240,7 +238,7 @@ get_website_url() {
     echo "   Total: ~$0.60/month"
     echo ""
     echo "🔧 Useful commands:"
-    echo "   Update site: gsutil -m cp -r *.html *.css *.js gs://$BUCKET_NAME/"
+    echo "   Update site: ./deploy-gcp.sh ${ENV}"
     echo "   Check usage: gsutil du -sh gs://$BUCKET_NAME"
     echo "   View logs: gsutil logging get gs://$BUCKET_NAME"
     echo "   Delete site: gsutil -m rm -r gs://$BUCKET_NAME"
@@ -276,6 +274,8 @@ trap cleanup EXIT
 main() {
     echo "🚀 Green Button Web App - Google Cloud Storage Deployment"
     echo "=========================================================="
+    ENV_UPPER=$(echo "$ENV" | tr 'a-z' 'A-Z')
+    print_status "Deploying to ${YELLOW}${ENV_UPPER}${NC} environment"
     echo ""
     
     check_dependencies
@@ -297,19 +297,23 @@ EOF
     
     print_success "🎉 Deployment completed successfully!"
     print_warning "Configuration saved to $CONFIG_FILE for easy updates"
-    echo "Run ./update-gcp.sh for quick updates in the future"
+    echo "For future updates, run ./deploy-gcp.sh for QA or ./deploy-gcp.sh prod for Production."
 }
 
 # Help function
 show_help() {
     echo "Green Button Web App - Google Cloud Storage Deployment Script"
     echo ""
-    echo "Usage: $0 [OPTIONS]"
+    echo "Usage: $0 [ENVIRONMENT] [OPTIONS]"
+    echo ""
+    echo "Environments:"
+    echo "  qa                  Deploy to QA environment (default)"
+    echo "  prod                Deploy to Production environment"
     echo ""
     echo "Options:"
     echo "  -h, --help              Show this help message"
-    echo "  -p, --project PROJECT   Set Google Cloud project ID"
-    echo "  -b, --bucket BUCKET     Set storage bucket name"
+    echo "  -p, --project PROJECT   Set Google Cloud project ID (overrides env default)"
+    echo "  -b, --bucket BUCKET     Set storage bucket name (overrides env default)"
     echo "  -r, --region REGION     Set bucket region (default: us-central1)"
     echo ""
     echo "Environment Variables:"
@@ -318,13 +322,32 @@ show_help() {
     echo "  REGION                 Bucket region"
     echo ""
     echo "Examples:"
-    echo "  $0                                    # Use current project"
-    echo "  $0 -p my-project                     # Specify project"
-    echo "  $0 -p my-project -b my-bucket        # Specify project and bucket"
+    echo "  $0                                    # Deploy to QA (default)"
+    echo "  $0 prod                               # Deploy to Production"
+    echo "  $0 -p my-project                     # Specify project, deploys to QA"
+    echo "  $0 prod -p my-project -b my-bucket   # Specify project and bucket for prod"
     echo ""
 }
 
-# Parse command line arguments
+# Parse environment from the first argument, if provided
+ENV="qa" # Default environment
+if [[ "$1" == "qa" || "$1" == "prod" ]]; then
+    ENV=$1
+    shift # Consume the environment argument
+fi
+
+# Set variables based on environment
+PROJECT_ID="greenbutton-qa-472903" # Use the same project for both environments
+
+if [[ "$ENV" == "prod" ]]; then
+    BUCKET_NAME="green-button-analyzer-prod" # Use a separate bucket for prod
+    CONFIG_FILE=".gcp-deploy-config-prod"
+else # Default to qa
+    BUCKET_NAME="green-button-analyzer"
+    CONFIG_FILE=".gcp-deploy-config"
+fi
+
+# Parse command line arguments (these will override environment settings)
 while [[ $# -gt 0 ]]; do
     case $1 in
         -h|--help)
