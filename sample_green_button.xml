@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xmlns:espi="http://naesb.org/espi">
+  <id>urn:uuid:c8c34b3a-d175-447b-bd00-176f60194de0</id>
+  <title>Green Button Sample Data</title>
+  <updated>2023-09-19T04:00:00Z</updated>
+  <link rel="self" href="https://example.com/DataCustodian/espi/1_1/resource/Batch/Subscription/1"/>
+  
+  <!-- Usage Point Entry -->
+  <entry>
+    <id>urn:uuid:c8c34b3a-d175-447b-bd00-176f60194de0</id>
+    <link href="https://example.com/DataCustodian/espi/1_1/resource/Subscription/1/UsagePoint" rel="up"/>
+    <link href="https://example.com/DataCustodian/espi/1_1/resource/Subscription/1/UsagePoint/1" rel="self"/>
+    <link href="https://example.com/DataCustodian/espi/1_1/resource/Subscription/1/UsagePoint/1/MeterReading" rel="related"/>
+    <link href="https://example.com/DataCustodian/espi/1_1/resource/Subscription/1/UsagePoint/1/ElectricPowerUsageSummary" rel="related"/>
+    <link href="https://example.com/DataCustodian/espi/1_1/resource/LocalTimeParameters/1" rel="related"/>
+    <title>Green Button Sample Data File</title>
+    <content>
+      <espi:UsagePoint>
+        <espi:ServiceCategory>
+          <espi:kind>1</espi:kind>
+        </espi:ServiceCategory>
+      </espi:UsagePoint>
+    </content>
+    <published>2023-01-01T00:00:00Z</published>
+    <updated>2023-01-01T00:00:00Z</updated>
+  </entry>
+
+  <!-- Reading Type Entry -->
+  <entry>
+    <id>urn:uuid:99b292fc-55f7-4f27-a3b9-cddab97cca90</id>
+    <link href="https://example.com/DataCustodian/espi/1_1/resource/ReadingType" rel="up"/>
+    <link href="https://example.com/DataCustodian/espi/1_1/resource/ReadingType/1" rel="self"/>
+    <title>Type of Meter Reading Data</title>
+    <content>
+      <espi:ReadingType>
+        <espi:accumulationBehaviour>4</espi:accumulationBehaviour>
+        <espi:commodity>1</espi:commodity>
+        <espi:currency>840</espi:currency>
+        <espi:dataQualifier>12</espi:dataQualifier>
+        <espi:flowDirection>1</espi:flowDirection>
+        <espi:intervalLength>86400</espi:intervalLength>
+        <espi:kind>12</espi:kind>
+        <espi:phase>769</espi:phase>
+        <espi:powerOfTenMultiplier>0</espi:powerOfTenMultiplier>
+        <espi:timeAttribute>0</espi:timeAttribute>
+        <espi:uom>72</espi:uom>
+      </espi:ReadingType>
+    </content>
+    <published>2023-01-01T00:00:00Z</published>
+    <updated>2023-01-01T00:00:00Z</updated>
+  </entry>
+
+  <!-- Meter Reading Entry -->
+  <entry>
+    <id>urn:uuid:4234ae39-fb6d-48ca-8856-ac9f41fb3d34</id>
+    <link href="https://example.com/DataCustodian/espi/1_1/resource/Subscription/1/UsagePoint/1/MeterReading" rel="up"/>
+    <link href="https://example.com/DataCustodian/espi/1_1/resource/Subscription/1/UsagePoint/1/MeterReading/1" rel="self"/>
+    <link href="https://example.com/DataCustodian/espi/1_1/resource/Subscription/1/UsagePoint/1/MeterReading/1/IntervalBlock" rel="related"/>
+    <link href="https://example.com/DataCustodian/espi/1_1/resource/ReadingType/1" rel="related"/>
+    <title>Monthly Electricity Consumption</title>
+    <content>
+      <espi:MeterReading/>
+    </content>
+    <published>2023-01-01T00:00:00Z</published>
+    <updated>2023-01-01T00:00:00Z</updated>
+  </entry>
+
+  <!-- Interval Block Entry with Sample Readings -->
+  <entry>
+    <id>urn:uuid:e0383570-16b1-4ab9-8642-fdb7e89660db</id>
+    <link href="https://example.com/DataCustodian/espi/1_1/resource/Subscription/1/UsagePoint/1/MeterReading/1/IntervalBlock" rel="up"/>
+    <link href="https://example.com/DataCustodian/espi/1_1/resource/Subscription/1/UsagePoint/1/MeterReading/1/IntervalBlock/1" rel="self"/>
+    <title>Daily Energy Readings</title>
+    <content>
+      <espi:IntervalBlock>
+        <espi:interval>
+          <espi:duration>2678400</espi:duration>
+          <espi:start>1672531200</espi:start>
+        </espi:interval>
+        
+        <!-- Day 1 Reading -->
+        <espi:IntervalReading>
+          <espi:cost>256347</espi:cost>
+          <espi:timePeriod>
+            <espi:duration>86400</espi:duration>
+            <espi:start>1672531200</espi:start>
+          </espi:timePeriod>
+          <espi:value>21021</espi:value>
+        </espi:IntervalReading>
+        
+        <!-- Day 2 Reading -->
+        <espi:IntervalReading>
+          <espi:cost>268543</espi:cost>
+          <espi:timePeriod>
+            <espi:duration>86400</espi:duration>
+            <espi:start>1672617600</espi:start>
+          </espi:timePeriod>
+          <espi:value>22150</espi:value>
+        </espi:IntervalReading>
+        
+        <!-- Day 3 Reading -->
+        <espi:IntervalReading>
+          <espi:cost>245321</espi:cost>
+          <espi:timePeriod>
+            <espi:duration>86400</espi:duration>
+            <espi:start>1672704000</espi:start>
+          </espi:timePeriod>
+          <espi:value>19876</espi:value>
+        </espi:IntervalReading>
+        
+        <!-- Day 4 Reading -->
+        <espi:IntervalReading>
+          <espi:cost>289654</espi:cost>
+          <espi:timePeriod>
+            <espi:duration>86400</espi:duration>
+            <espi:start>1672790400</espi:start>
+          </espi:timePeriod>
+          <espi:value>24532</espi:value>
+        </espi:IntervalReading>
+        
+        <!-- Day 5 Reading -->
+        <espi:IntervalReading>
+          <espi:cost>275123</espi:cost>
+          <espi:timePeriod>
+            <espi:duration>86400</espi:duration>
+            <espi:start>1672876800</espi:start>
+          </espi:timePeriod>
+          <espi:value>23145</espi:value>
+        </espi:IntervalReading>
+        
+      </espi:IntervalBlock>
+    </content>
+    <published>2023-01-01T00:00:00Z</published>
+    <updated>2023-01-05T23:59:59Z</updated>
+  </entry>
+
+  <!-- Local Time Parameters Entry -->
+  <entry>
+    <id>urn:uuid:e30ce77d-ec22-4da5-83c2-991ba34c97d6</id>
+    <link href="https://example.com/DataCustodian/espi/1_1/resource/LocalTimeParameters" rel="up"/>
+    <link href="https://example.com/DataCustodian/espi/1_1/resource/LocalTimeParameters/1" rel="self"/>
+    <title>DST For North America</title>
+    <content>
+      <espi:LocalTimeParameters>
+        <espi:dstEndRule>B40E2000</espi:dstEndRule>
+        <espi:dstOffset>3600</espi:dstOffset>
+        <espi:dstStartRule>360E2000</espi:dstStartRule>
+        <espi:tzOffset>-18000</espi:tzOffset>
+      </espi:LocalTimeParameters>
+    </content>
+    <published>2023-01-01T00:00:00Z</published>
+    <updated>2023-01-01T00:00:00Z</updated>
+  </entry>
+
+  <!-- Usage Summary Entry -->
+  <entry>
+    <id>urn:uuid:923a7143-263e-421b-bea2-e41b7e240013</id>
+    <link href="https://example.com/DataCustodian/espi/1_1/resource/Subscription/1/UsagePoint/1/UsageSummary" rel="up"/>
+    <link href="https://example.com/DataCustodian/espi/1_1/resource/Subscription/1/UsagePoint/1/UsageSummary/1" rel="self"/>
+    <title>Usage Summary</title>
+    <content>
+      <espi:UsageSummary>
+        <espi:billingPeriod>
+          <espi:duration>2419200</espi:duration>
+          <espi:start>1672531200</espi:start>
+        </espi:billingPeriod>
+        <espi:billLastPeriod>6752000</espi:billLastPeriod>
+        <espi:billToDate>4807000</espi:billToDate>
+        <espi:costAdditionalLastPeriod>0</espi:costAdditionalLastPeriod>
+        <espi:currency>840</espi:currency>
+        <espi:overallConsumptionLastPeriod>
+          <espi:powerOfTenMultiplier>0</espi:powerOfTenMultiplier>
+          <espi:uom>72</espi:uom>
+          <espi:value>110724</espi:value>
+        </espi:overallConsumptionLastPeriod>
+        <espi:qualityOfReading>14</espi:qualityOfReading>
+      </espi:UsageSummary>
+    </content>
+    <published>2023-01-01T00:00:00Z</published>
+    <updated>2023-01-05T23:59:59Z</updated>
+  </entry>
+
+</feed>

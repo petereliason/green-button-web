@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Green Button XML to CSV Converter</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Green Button XML to CSV Converter</h1>
+            <p>Convert energy consumption data from Green Button XML format to CSV</p>
+        </header>
+
+        <main>
+            <div class="upload-section">
+                <div class="file-input-wrapper">
+                    <input type="file" id="xmlFileInput" accept=".xml" />
+                    <label for="xmlFileInput" class="file-input-label">
+                        <span class="file-input-text">Choose Green Button XML File</span>
+                        <span class="file-input-button">Browse</span>
+                    </label>
+                </div>
+                <div class="file-info" id="fileInfo" style="display: none;">
+                    <p id="fileName"></p>
+                    <p id="fileSize"></p>
+                </div>
+            </div>
+
+            <div class="processing-section" id="processingSection" style="display: none;">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <p id="processingStatus">Processing XML file...</p>
+            </div>
+
+            <div class="results-section" id="resultsSection" style="display: none;">
+                <h2>Processing Results</h2>
+                <div class="metadata-summary">
+                    <h3>File Information</h3>
+                    <div class="metadata-grid">
+                        <div class="metadata-item">
+                            <span class="metadata-label">Feed ID:</span>
+                            <span id="feedId">N/A</span>
+                        </div>
+                        <div class="metadata-item">
+                            <span class="metadata-label">Feed Title:</span>
+                            <span id="feedTitle">N/A</span>
+                        </div>
+                        <div class="metadata-item">
+                            <span class="metadata-label">Last Updated:</span>
+                            <span id="feedUpdated">N/A</span>
+                        </div>
+                        <div class="metadata-item">
+                            <span class="metadata-label">Total Entries:</span>
+                            <span id="totalEntries">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="data-summary">
+                    <h3>Data Summary</h3>
+                    <div class="summary-grid">
+                        <div class="summary-item">
+                            <span class="summary-label">Usage Points:</span>
+                            <span id="usagePointsCount">0</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Meter Readings:</span>
+                            <span id="meterReadingsCount">0</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Total Intervals:</span>
+                            <span id="intervalsCount">0</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Date Range:</span>
+                            <span id="dateRange">N/A</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="export-options">
+                    <button id="exportCsvBtn" class="export-btn">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                        </svg>
+                        Export to CSV
+                    </button>
+                </div>
+
+                <div class="field-explanation">
+                    <h3>Field Explanations</h3>
+                    <div class="explanation-grid">
+                        <div class="explanation-item">
+                            <strong>value:</strong> Energy consumption value (integer, use power_multiplier for conversion)
+                        </div>
+                        <div class="explanation-item">
+                            <strong>cost:</strong> Cost value (unit depends on utility/currency)
+                        </div>
+                        <div class="explanation-item">
+                            <strong>uom:</strong> Unit of measure (e.g., 'Wh' = Watt-hours, 'kWh' = Kilowatt-hours)
+                        </div>
+                        <div class="explanation-item">
+                            <strong>power_multiplier:</strong> Power of 10 to apply to raw values<br>
+                            <em>-3 = ÷1000, 0 = no change, 3 = ×1000</em>
+                        </div>
+                        <div class="explanation-item">
+                            <strong>calculated_value:</strong> Convenience field: value × 10^power_multiplier<br>
+                            <em>Actual energy consumption in the unit specified by UOM</em>
+                        </div>
+                        <div class="explanation-item">
+                            <strong>calculated_cost:</strong> Convenience field: (cost × 10^power_multiplier) ÷ 100<br>
+                            <em>Cost in dollars if currency is USD, otherwise may be incorrect</em>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="preview-section">
+                    <h3>Data Preview</h3>
+                    <div class="table-container">
+                        <table id="previewTable">
+                            <thead id="previewTableHead">
+                            </thead>
+                            <tbody id="previewTableBody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="specifications-section">
+                    <h3>📋 Green Button Data Specifications</h3>
+                    
+                    <div class="spec-category">
+                        <h4>Power Multiplier Examples</h4>
+                        <div class="spec-grid">
+                            <div class="spec-item">
+                                <strong>Power Multiplier: 3</strong><br>
+                                Raw: 21 → Actual: 21,000 (× 1,000)<br>
+                                <em>Used for: Large industrial values</em>
+                            </div>
+                            <div class="spec-item">
+                                <strong>Power Multiplier: 0</strong><br>
+                                Raw: 21021 → Actual: 21,021 (no change)<br>
+                                <em>Used for: Standard readings</em>
+                            </div>
+                            <div class="spec-item">
+                                <strong>Power Multiplier: -3</strong><br>
+                                Raw: 21021 → Actual: 21.021 (÷ 1,000)<br>
+                                <em>Used for: Utility precision data</em>
+                            </div>
+                            <div class="spec-item">
+                                <strong>Power Multiplier: -6</strong><br>
+                                Raw: 21021000 → Actual: 21.021 (÷ 1,000,000)<br>
+                                <em>Used for: High precision meters</em>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="spec-category">
+                        <h4>Common Units of Measure (UOM)</h4>
+                        <div class="spec-grid">
+                            <div class="spec-item">
+                                <strong>Code 72: Wh</strong><br>Watt-hours (energy)
+                            </div>
+                            <div class="spec-item">
+                                <strong>Code 73: kWh</strong><br>Kilowatt-hours (energy)
+                            </div>
+                            <div class="spec-item">
+                                <strong>Code 38: W</strong><br>Watts (power)
+                            </div>
+                            <div class="spec-item">
+                                <strong>Code 42: m³</strong><br>Cubic meters (gas/water)
+                            </div>
+                            <div class="spec-item">
+                                <strong>Code 119: ft³</strong><br>Cubic feet (gas)
+                            </div>
+                            <div class="spec-item">
+                                <strong>Code 122: gal</strong><br>Gallons (water)
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="spec-category">
+                        <h4>Cost Data</h4>
+                        <div class="spec-grid">
+                            <div class="spec-item">
+                                <strong>Currency 840 = USD</strong><br>
+                                cost typically in cents<br>
+                                <em>Example: 256347 = 256,347 cents</em>
+                            </div>
+                            <div class="spec-item">
+                                <strong>Other Currencies</strong><br>
+                                978 = EUR, 826 = GBP, 124 = CAD<br>
+                                <em>ISO 4217 currency codes</em>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="spec-category">
+                        <h4>Interval Durations</h4>
+                        <div class="spec-grid">
+                            <div class="spec-item">
+                                <strong>900 seconds</strong><br>15-minute intervals
+                            </div>
+                            <div class="spec-item">
+                                <strong>3600 seconds</strong><br>1-hour intervals  
+                            </div>
+                            <div class="spec-item">
+                                <strong>86400 seconds</strong><br>1-day intervals (daily readings)
+                            </div>
+                            <div class="spec-item">
+                                <strong>2678400 seconds</strong><br>~1-month intervals (monthly)
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="calculation-example">
+                        <h4>💡 Real Example from Your Data</h4>
+                        <div class="example-box">
+                            <p><strong>Original Data:</strong> value = 21021, cost = 256347, power_multiplier = -3, uom = "Wh"</p>
+                            <p><strong>Value Calculation:</strong> 21021 × 10<sup>-3</sup> = 21021 × 0.001 = 21.021</p>
+                            <p><strong>Cost Calculation:</strong> 256347 × 10<sup>-3</sup> = 256347 × 0.001 = 256.347, then 256.347 ÷ 100 = $2.56</p>
+                            <p><strong>Results:</strong></p>
+                            <ul>
+                                <li><strong>calculated_value:</strong> 21.021 Wh (Watt-hours) of energy consumed</li>
+                                <li><strong>In kWh:</strong> 21.021 ÷ 1000 = 0.021021 kWh</li>
+                                <li><strong>calculated_cost:</strong> $2.56 (assuming USD cents)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="error-section" id="errorSection" style="display: none;">
+                <h2>Error</h2>
+                <p id="errorMessage"></p>
+                <button id="resetBtn" class="reset-btn">Try Another File</button>
+            </div>
+        </main>
+
+        <footer>
+            <p>Green Button XML to CSV Converter | Client-side processing ensures your data stays private</p>
+        </footer>
+    </div>
+
+    <script src="greenButtonParser.js"></script>
+    <script src="csvExporter.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
